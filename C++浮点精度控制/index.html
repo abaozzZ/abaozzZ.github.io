@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.1">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/A128.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/A.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/A16.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"yoursite.com","root":"/","scheme":"Mist","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="C++浮点精度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++浮点数精度控制">
+<meta property="og:url" content="http://yoursite.com/C++%E6%B5%AE%E7%82%B9%E7%B2%BE%E5%BA%A6%E6%8E%A7%E5%88%B6/index.html">
+<meta property="og:site_name" content="阿宝的个人笔记">
+<meta property="og:description" content="C++浮点精度">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-20T08:14:48.499Z">
+<meta property="article:author" content="abao">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/C++%E6%B5%AE%E7%82%B9%E7%B2%BE%E5%BA%A6%E6%8E%A7%E5%88%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>C++浮点数精度控制 | 阿宝的个人笔记</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">阿宝的个人笔记</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/C++%E6%B5%AE%E7%82%B9%E7%B2%BE%E5%BA%A6%E6%8E%A7%E5%88%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/1.jpg">
+      <meta itemprop="name" content="abao">
+      <meta itemprop="description" content="阿宝的个人笔记">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="阿宝的个人笔记">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++浮点数精度控制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-14 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-14T00:00:00+08:00">2020-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-20 16:14:48" itemprop="dateModified" datetime="2020-04-20T16:14:48+08:00">2020-04-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/C-%E9%A2%98%E7%9B%AE/" itemprop="url" rel="index"><span itemprop="name">C++题目</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/C++%E6%B5%AE%E7%82%B9%E7%B2%BE%E5%BA%A6%E6%8E%A7%E5%88%B6/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/C++%E6%B5%AE%E7%82%B9%E7%B2%BE%E5%BA%A6%E6%8E%A7%E5%88%B6/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>2.1k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>2 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>C++浮点精度</p>
+<a id="more"></a>
+
+<h3 id="C-浮点数精度控制"><a href="#C-浮点数精度控制" class="headerlink" title="C++浮点数精度控制"></a>C++浮点数精度控制</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#include&lt;iomanip&gt;</span><br><span class="line">...</span><br><span class="line">cout&lt;&lt;setiosflags(ios::fixed);  &#x2F;&#x2F;保证setprecision()是设置小数点后的位数。</span><br><span class="line">cout&lt;&lt;setprecision(2) &lt;&lt; pi &lt;&lt; endl;    &#x2F;&#x2F;输出3.14</span><br><span class="line">cout&lt;&lt;pi&lt;&lt;endl; &#x2F;&#x2F;输出3.14</span><br></pre></td></tr></table></figure>
+<!-- more -->
+
+<ul>
+<li>相关知识<br>流输入输出也可以进行格式控制， C++ 中是通过流操纵算子来实现的。流操纵算子是在头文件 iomanip 中定义的，因此要使用这些流操纵算子，必须包含该头文件。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 包含流操作算子库</span><br><span class="line">#include &lt;iomanip&gt;</span><br></pre></td></tr></table></figure>
+
+<p>C++ 的 iomanip 库提供了多种流操纵算子，来实现不同的格式控制功能，包括设置域宽、设置精度、设置和清除格式化标志、设置域填充字符、在输出流中插入空字符、跳过输入流中的空白字符等，下表为一些常用的流操作算子：</p>
+<table>
+<thead>
+<tr>
+<th>流操纵算子</th>
+<th>功能描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>setbase(b)</td>
+<td>以进制基数 b 为输出整数值</td>
+</tr>
+<tr>
+<td>setprecision(n)</td>
+<td>将浮点精度设置为 n</td>
+</tr>
+<tr>
+<td>setiosflags(long)</td>
+<td>设置特定的格式标志位</td>
+</tr>
+<tr>
+<td>setw(n)</td>
+<td>按照 n 个字符来读或者写</td>
+</tr>
+<tr>
+<td>setfill(ch)</td>
+<td>用 ch 填充空白字符</td>
+</tr>
+<tr>
+<td>flush</td>
+<td>刷新 ostream 缓冲区</td>
+</tr>
+<tr>
+<td>ends</td>
+<td>输出空字符</td>
+</tr>
+<tr>
+<td>endl</td>
+<td>输出换行符并刷新 ostream</td>
+</tr>
+<tr>
+<td>ws</td>
+<td>跳过空白字符（用于输入）</td>
+</tr>
+<tr>
+<td>下面本关主要介绍setbase(b)、setprecision(n)、setiosflags(long)和setw(n)算子，剩下的同学们可以自己尝试。</td>
+<td></td>
+</tr>
+</tbody></table>
+<h5 id="控制进制基数"><a href="#控制进制基数" class="headerlink" title="控制进制基数"></a>控制进制基数</h5><p>对于标准输出流 cout 可以使用 setbase 来设置输出整数的进制基数（只支持88、1010、1616进制），如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 以八进制形式输出整数 n</span><br><span class="line">cout &lt;&lt; setbase(8) &lt;&lt; n &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p>也可以直接使用流操纵算子 oct（八进制）、hex（十六进制）和 dec（十进制）直接控制输出整数的进制，如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 以十六进制输出整数 n</span><br><span class="line">cout &lt;&lt; hex &lt;&lt; n &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<h6 id="设置浮点数输出精度"><a href="#设置浮点数输出精度" class="headerlink" title="设置浮点数输出精度"></a>设置浮点数输出精度</h6><p>流操纵算子 setprecision 或函数 precision 都可以设置浮点数输出的精度，其参数为输出浮点数的有效数字个数（包括整数部分和小数部分，如12.3412.34的有效数字个数为44）。</p>
+<p>例如按55位有效位输出12.3 * 3.578的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cout &lt;&lt; setprecision(5) &lt;&lt; 12.3 * 3.578 &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p>或者：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cout.precision(5);</span><br><span class="line">cout &lt;&lt; 12.3 * 3.578 &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p>以上输出结果均为：44.009</p>
+<h6 id="设置辅助格式"><a href="#设置辅助格式" class="headerlink" title="设置辅助格式"></a>设置辅助格式</h6><p>流操纵算子 setiosflags 可以辅助设置流输入输出格式，其参数是该流的格式标志值，setiosflags 提供了不同的参数来支持不同的输入输出格式需求。</p>
+<p>setiosflags 的格式标志值如下表格：</p>
+<table>
+<thead>
+<tr>
+<th>标志值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ios::skipws</td>
+<td>在输入中跳过空白</td>
+</tr>
+<tr>
+<td>ios::left</td>
+<td>左对齐，用填充字符填充右边。</td>
+</tr>
+<tr>
+<td>ios::right</td>
+<td>右对齐，用填充字符填充左边(缺省对齐方式)。</td>
+</tr>
+<tr>
+<td>ios::dec</td>
+<td>以基 10（十进制）格式化数值（缺省进制）</td>
+</tr>
+<tr>
+<td>ios::oct</td>
+<td>以基 8（八进制）格式化数值</td>
+</tr>
+<tr>
+<td>ios::hex</td>
+<td>以基 16（十六进制）格式化数值</td>
+</tr>
+<tr>
+<td>ios::showbase</td>
+<td>以 C++ 编译器能读的格式显示数值常量</td>
+</tr>
+<tr>
+<td>ios::showpoint</td>
+<td>按精度把后面的空白补 0 输出</td>
+</tr>
+<tr>
+<td>ios::uppercase</td>
+<td>对于十六进制数值显示大写字母 A 到 F，对于科学格式显示大写字母 E。</td>
+</tr>
+<tr>
+<td>ios::showpos</td>
+<td>对于正数显示正号（+）</td>
+</tr>
+<tr>
+<td>ios::scientific</td>
+<td>以科学格式显示浮点数值</td>
+</tr>
+<tr>
+<td>ios::fixed</td>
+<td>以定点格式显示浮点数值</td>
+</tr>
+<tr>
+<td>例如：</td>
+<td></td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. double x &#x3D; 1.23;</span><br><span class="line">2. cout &lt;&lt; setprecision(5) &lt;&lt; x &lt;&lt; endl;</span><br><span class="line">3. cout &lt;&lt; setiosflags(ios::showpoint) &lt;&lt; setprecision(5) &lt;&lt; x &lt;&lt; endl;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 1.23</span><br><span class="line">2. 1.2300</span><br></pre></td></tr></table></figure>
+
+<h6 id="域宽"><a href="#域宽" class="headerlink" title="域宽"></a>域宽</h6><p>对于域宽，函数 width 和流操纵算子 setw 都可以实现对当前域宽（即输入输出的字符数）的设置。</p>
+<ul>
+<li><p>如果输出的数据所需的宽度比设置的域宽小，空位用填充字符（默认为空格）填充；</p>
+</li>
+<li><p>如果被显示的数据所需的宽度比设置的域宽大，系统会自动突破宽度限制，输出所有位。</p>
+</li>
+</ul>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cin &gt;&gt; n;</span><br><span class="line">cout &lt;&lt; setw(6) &lt;&lt; n &lt;&lt; endl;     &#x2F;&#x2F; 以域宽输出 n，如果 n 不足位，前面补空格</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章推荐</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\C++字符串输入\" rel="bookmark">C++字符串输入</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\一年中的第几天\" rel="bookmark">一年中的第几天</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\判断是否闰年\" rel="bookmark">判断是否闰年</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\杨辉三角形\" rel="bookmark">杨辉三角形</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\用字符数组存储整数时，获取字符对应的整数\" rel="bookmark">获取字符对应的整数</a></div>
+    </li>
+  </ul>
+
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/C++%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BE%93%E5%85%A5/" rel="prev" title="C++字符串输入">
+      <i class="fa fa-chevron-left"></i> C++字符串输入
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020%E8%93%9D%E6%A1%A5%E6%9D%AF%E5%A4%A7%E8%B5%9B%E6%A8%A1%E6%8B%9F%E9%A2%98/" rel="next" title="2020蓝桥杯大赛模拟题">
+      2020蓝桥杯大赛模拟题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#C-浮点数精度控制"><span class="nav-number">1.</span> <span class="nav-text">C++浮点数精度控制</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#控制进制基数"><span class="nav-number">1.0.1.</span> <span class="nav-text">控制进制基数</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#设置浮点数输出精度"><span class="nav-number">1.0.1.1.</span> <span class="nav-text">设置浮点数输出精度</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#设置辅助格式"><span class="nav-number">1.0.1.2.</span> <span class="nav-text">设置辅助格式</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#域宽"><span class="nav-number">1.0.1.3.</span> <span class="nav-text">域宽</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="abao"
+      src="/images/1.jpg">
+  <p class="site-author-name" itemprop="name">abao</p>
+  <div class="site-description" itemprop="description">阿宝的个人笔记</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/abaozzZ" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;abaozzZ" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">abao</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="站点总字数">42k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">38 分钟</span>
+
+  <span class="post-meta-divider">|</span>
+<span id="busuanzi_container_site_pv">
+	<span class="post-meta-item-icon">
+		<i class="fa fa-eye"></i>
+	</span>
+	访问量：<span id="busuanzi_value_site_pv"></span> 次数
+</span>
+
+<span class="post-meta-divider">|</span>
+	<span id="busuanzi_container_site_uv">
+	访客数：<span id="busuanzi_value_site_uv"></span> 人次
+</span>
+
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://mist.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> 强力驱动
+  </div><script color="0,0,255" opacity="0.5" zIndex="-1" count="99" src="https://cdn.jsdelivr.net/npm/canvas-nest.js@1/dist/canvas-nest.js"></script>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+   
+<script>
+  var OriginTitile = document.title;
+  var titleTime;
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden) {
+      document.title = "(つェ⊂)我藏好了哦~" + OriginTitile;
+      clearTimeout(titleTime);
+    } else {
+      document.title = "(*´∇｀*) 被你发现啦~" + OriginTitile;
+      titleTime = setTimeout(function() {
+        document.title = OriginTitile;
+      }, 2000);
+    }
+  });
+</script>
+
+
+
+
+  <script async src="/js/cursor/fireworks.js"></script>
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'T7ar6uP5jdIAlkrgbsjVysGB-gzGzoHsz',
+      appKey     : 'glfNxPOoCY3VLS3UMMSj3GQS',
+      placeholder: "欢迎交流讨论",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : false,
+      lang       : '' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
